@@ -16,7 +16,7 @@ p9_3 <- ggplot(data.frame(x = c(-10, 90)), aes(x = x)) +
   stat_function(fun = dnorm, args = list(mean(d), sd(d))) +
   stat_function(fun = dnorm, args = list(overall_mean, overall_sd), colour = "red", linetype="dashed") +
   xlab("Temperature") +
-  ylab("Growth")
+  ylab("Growth Rate")
 p9_3
 
 # print ggplot2 data visualization cheat sheet
@@ -70,3 +70,18 @@ plot(x, y)
 y <- rnorm(50)
 
 hist(y, main = "Normal Distribution")
+
+
+x1 <- rnorm (3500, mean=65, sd=4.58)
+hist(x1)
+
+
+set.seed(1)
+df <- data.frame(Temperature = 10*rnorm(1000))
+ggplot(df, aes(x = Temperature)) + 
+  geom_histogram(aes(y =..density..),
+                 breaks = seq(-50, 50, by = 10), 
+                 colour = "black", 
+                 fill = "white") +
+  stat_function(fun = dnorm, args = list(mean = mean(df$Temperature), sd = sd(df$Temperature)))
+
