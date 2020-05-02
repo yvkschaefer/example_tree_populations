@@ -85,3 +85,7 @@ ggplot(df, aes(x = Temperature)) +
                  fill = "white") +
   stat_function(fun = dnorm, args = list(mean = mean(df$Temperature), sd = sd(df$Temperature)))
 
+
+ggplot(df, aes(x = Temperature)) + 
+  geom_histogram(alpha=0.3, fill='white', colour='black', binwidth=.04) +
+  geom_density(aes(y=0.045*..count..), colour="red", adjust=4)
