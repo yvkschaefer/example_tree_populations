@@ -1,4 +1,5 @@
 library(ggplot2)
+library(tidyverse)
 
 a <- seq(0, 20, by = .1)
 b <- seq(20, 40, by = .1)
@@ -26,24 +27,6 @@ ggplot(data.frame(x = rnorm(100)), aes(x)) +
   geom_density() +
   stat_function(fun = dnorm, colour = "red")
 
-
-ggplot(diamonds, aes(carat)) +
-  geom_density()
-
-
-# calculate the means
-iris.mean <- aggregate(x = iris, by = list(iris$Species), FUN = mean)
-# create a simple barplot
-barplot(iris.mean$Sepal.Length)
-
-
-beaver.mean <- aggregate(x = beaver1, by = list(beaver1$day), FUN = mean)
-beaver_2.mean <- aggregate(x = beaver2, by = list(beaver2$day), FUN = mean)
-
-tree <- rbind(beaver.mean, beaver_2.mean)
-names(tree) <- c("Population", "del", "Growth", "Temperature", "Activity")
-tree$del <- NULL
-barplot(tree$Population)
 
 
 
@@ -76,16 +59,35 @@ x1 <- rnorm (3500, mean=65, sd=4.58)
 hist(x1)
 
 
-set.seed(1)
-df <- data.frame(Temperature = 10*rnorm(1000))
-ggplot(df, aes(x = Temperature)) + 
-  geom_histogram(aes(y =..density..),
-                 breaks = seq(-50, 50, by = 10), 
-                 colour = "black", 
-                 fill = "white") +
-  stat_function(fun = dnorm, args = list(mean = mean(df$Temperature), sd = sd(df$Temperature)))
+set.seed(1) # sets a seed of reproducible results. used to produce the same sample again and again
+my_hist <- data.frame( # my_hist is a data frame with two columns, group as well as value. It has 700 rows
+  group = c(rep("A", 200), rep("B",150), rep("C",250), rep("D",100)),
+  value = c(rnorm(200, 20, 5), # rnorm has n, number of observations, mean, and standard deviation. 200, 20, 5
+            # standard deviation is a measure of how spread out numbers are
+            # is the square root of the variance
+            # the variance is the average of the squared differences from the mean
+            # https://www.mathsisfun.com/data/standard-deviation.html
+            rnorm(150,25,10),
+            rnorm(250,25,10),
+            rnorm(100,25,10)))
+
+# Set desired binwidth and number of non-missing obs
+bw = 2
+n_obs = sum(!is.na(my_hist$value))
 
 
-ggplot(df, aes(x = Temperature)) + 
-  geom_histogram(alpha=0.3, fill='white', colour='black', binwidth=.04) +
-  geom_density(aes(y=0.045*..count..), colour="red", adjust=4)
+my_hist %>% 
+  group_by(group) %>%
+  nest(value) %>% # nesting creates a list-column of data frames, unnesting flattens it back out into regular columns
+# map() apply a function to each element of a vector. map() always returns a list
+# tilde is used to separate the left- and right-hand sides in a model formula. Our formula here describes the dnorm being multiplied by the bin_width and the sum of all the non_missing observations
+# dnorm takes a vector (.$value in this case), a mean, and standard deviation
+  mutate(y = map(data, ~ dnorm(
+    .$value, mean = mean(.$value), sd = sd(.$value)
+  ) * bw * sum(!is.na(.$value)))) %>% 
+  unnest(data,y) %>% 
+  
+  ggplot(aes(x = value)) +
+  geom_histogram(data = my_hist, binwidth = bw, colour = "black") +
+  geom_line(aes(y = y)) + 
+  facet_wrap(~ group)
