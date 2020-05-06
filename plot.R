@@ -61,15 +61,16 @@ hist(x1)
 
 set.seed(1) # sets a seed of reproducible results. used to produce the same sample again and again
 my_hist <- data.frame( # my_hist is a data frame with two columns, group as well as value. It has 700 rows
-  group = c(rep("A", 200), rep("B",150), rep("C",250), rep("D",100)),
-  value = c(rnorm(200, 20, 5), # rnorm has n, number of observations, mean, and standard deviation. 200, 20, 5
+  group = c(rep("A", 300), rep("B",150), rep("C",150), rep("D",100),rep("E",100)),
+  value = c(rnorm(300, 30, 10), # rnorm has n, number of observations, mean, and standard deviation. 200, 20, 5
             # standard deviation is a measure of how spread out numbers are
             # is the square root of the variance
             # the variance is the average of the squared differences from the mean
             # https://www.mathsisfun.com/data/standard-deviation.html
-            rnorm(150,25,10),
-            rnorm(250,25,10),
-            rnorm(100,25,10)))
+            rnorm(150,5,10),
+            rnorm(150,15,10),
+            rnorm(100,50,10),
+            rnorm(100,75,10)))
 
 # Set desired binwidth and number of non-missing obs
 bw = 2
@@ -88,6 +89,7 @@ my_hist %>%
   unnest(data,y) %>% 
   
   ggplot(aes(x = value)) +
-  geom_histogram(data = my_hist, binwidth = bw, colour = "black") +
-  geom_line(aes(y = y)) + 
+  geom_histogram(data = my_hist, binwidth = bw, alpha = 0) +
+  geom_line(aes(y = y), colour = "black") + 
   facet_wrap(~ group)
+
