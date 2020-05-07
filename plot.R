@@ -63,3 +63,5 @@ ggplot(df_all, aes(x = value, y = y, colour = group)) +
   ylab("Growth Rate (mm)") +
   ggtitle("Growth Rate of Species and Select Populations by Growing Degree Days") +
   theme_few()
+
+ggsave("growth_rate.png")
